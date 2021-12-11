@@ -1,12 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
-get_ipython().run_line_magic('pylab', 'inline')
-
-
 #     Initial state: 3,4,3,1,2
 #     After  1 day:  2,3,2,0,1
 #     After  2 days: 1,2,1,6,0,8
