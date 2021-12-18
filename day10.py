@@ -115,7 +115,13 @@ for line in lines:
 scores2={")":1,"]":2,"}":3,">":4}
 
 
-# In[17]:
+# In[18]:
+
+
+from numpy import median
+
+
+# In[19]:
 
 
 score_lines=[]
