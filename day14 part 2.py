@@ -29,10 +29,6 @@ start=parts[0].strip()
 insertion_rules={}
 for m in parts[1].strip().split("\n"):
     if not m:
-        continue
-    key=m.split("->")[0].strip()
-    char=m.split("->")[1].strip()    
-    insertion_rules[key]=char
 
 
 # In[17]:
@@ -43,7 +39,7 @@ def pairs(S):
         yield c1+c2
 
 
-# In[98]:
+# In[130]:
 
 
 def get_pair_counts(start):
@@ -53,36 +49,44 @@ def get_pair_counts(start):
             pair_counts[p]=1
         else:
             pair_counts[p]+=1
+            
+    charset=set(start)
+    char_counts={c:start.count(c) for c in charset}
+    
 
-    return pair_counts    
-
-
-# In[100]:
-
-
-pair_counts=get_pair_counts(start)
-pair_counts
+    return pair_counts,char_counts    
 
 
-# In[101]:
+# In[131]:
 
 
-def step_pair(pair_counts):
+pair_counts,char_counts=get_pair_counts(start)
+pair_counts,char_counts
+
+
+# In[132]:
+
+
+def step_pair(pair_counts,char_counts):
     new_pair_counts={}
-
+    new_char_counts=char_counts.copy()
+    
     for pair in pair_counts:
         insert_char=insertion_rules[pair]
         
+        if insert_char in char_counts:
+            new_char_counts[insert_char]+=pair_counts[pair]
+        else:
+            new_char_counts[insert_char]=pair_counts[pair]
+            
         for p in [pair[0]+insert_char,insert_char+pair[1]]:
-#             print(p)
             if not p in new_pair_counts:
                 new_pair_counts[p]=pair_counts[pair]
             else:
                 new_pair_counts[p]+=pair_counts[pair]
-#             print("\t",new_pair_counts)
         
         
-    return new_pair_counts
+    return new_pair_counts,new_char_counts
 
 def step(start):
     new_str=""
@@ -94,27 +98,27 @@ def step(start):
     return new_str
 
 
-# In[102]:
+# In[133]:
 
 
 
-new_pc=pair_counts
-new_pc,start
+new_pc,new_c=pair_counts,char_counts
+new_pc,new_c,start
 
 
-# In[103]:
+# In[134]:
 
 
 step(start)
 
 
-# In[104]:
+# In[135]:
 
 
-step_pair(new_pc)
+step_pair(new_pc,new_c)
 
 
-# In[105]:
+# In[136]:
 
 
 strings=[]
@@ -125,13 +129,13 @@ for i in range(2):
     strings.append(new_str)
 
 
-# In[106]:
+# In[137]:
 
 
 strings[-1]
 
 
-# In[107]:
+# In[138]:
 
 
 charset=set(strings[-1])
@@ -139,93 +143,102 @@ counts=[strings[-1].count(c) for c in charset]
 counts,charset
 
 
-# In[108]:
+# In[139]:
 
 
 max(counts)-min(counts)
 
 
-# In[109]:
+# In[140]:
 
 
-new_pc=pair_counts
-print(new_pc)
+new_pc,new_c=pair_counts,char_counts
+print(new_pc,new_c)
 for i in range(2):
-    new_pc=step_pair(new_pc)
-print(new_pc)
+    new_pc,new_c=step_pair(new_pc,new_c)
+print(new_pc,new_c)
     
 
 
-# In[110]:
+# In[141]:
 
 
 get_pair_counts(strings[-1])
 
 
-# In[120]:
+# In[142]:
 
 
-fake_str=""
-keys=list(new_pc.keys())
+with open('data/day14.txt') as fid:
+    text=fid.read()
+parts=text.split("\n\n")
+parts  
 
-c='N'
-e='B'
-for key in keys:
-    if key.endswith(e) and not key.startswith(c):
-        break
-end_key=key
 
-while keys:
-    if keys==[end_key]:
-        key=end_key
-    else:
-        for key in keys:
-            if key.startswith(c) and key!=end_key:
-                break
-            
-    keys.remove(key)
-    fake_str+=key*new_pc[key]
-    c=key[1]
+# In[143]:
+
+
+start=parts[0].strip()
+insertion_rules={}
+for m in parts[1].strip().split("\n"):
+    if not m:
+        continue
+    key=m.split("->")[0].strip()
+    char=m.split("->")[1].strip()    
+    insertion_rules[key]=char
+
+
+# In[144]:
+
+
+strings=[]
+strings.append(start)
+new_str=start
+for i in range(10):
+    new_str=step(new_str)
+    strings.append(new_str)
+
+
+# In[145]:
+
+
+charset=set(strings[-1])
+counts=[strings[-1].count(c) for c in charset]
+
+
+# In[146]:
+
+
+max(counts)-min(counts)
+
+
+# In[147]:
+
+
+pair_counts,char_counts=get_pair_counts(start)
+pair_counts,char_counts
+
+
+# In[148]:
+
+
+new_pc,new_c=pair_counts,char_counts
+for i in range(10):
+    new_pc,new_c=step_pair(new_pc,new_c)  
     
+counts=[new_c[k] for k in new_c]
+max(counts)-min(counts)
 
 
-# In[121]:
+# In[149]:
 
 
-start
-
-
-# In[122]:
-
-
-fake_str
-
-
-# In[123]:
-
-
-get_pair_counts(fake_str)
-
-
-# In[112]:
-
-
-charset=set(fake_str)
-counts=[fake_str.count(c) for c in charset]
-counts,charset
-
-
-# In[82]:
-
-
-pair_counts={}
-for p in pairs(fake_str):
-    if not p in pair_counts:
-        pair_counts[p]=1
-    else:
-        pair_counts[p]+=1
-        
-pair_counts
+new_pc,new_c=pair_counts,char_counts
+for i in range(40):
+    new_pc,new_c=step_pair(new_pc,new_c)  
+    
+counts=[new_c[k] for k in new_c]
+max(counts)-min(counts)
 
 
 # In[ ]:
